@@ -1,0 +1,141 @@
+// prisma schema (Neon PostgreSQL)
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Goal {
+  MUSCLE_GAIN
+  WEIGHT_LOSS
+  ENERGY
+  RECOVERY
+  GENERAL
+}
+
+enum OrderStatus {
+  pending
+  shipped
+  delivered
+  cancelled
+}
+
+model Category {
+  id          String    @id @default(cuid())
+  name        String
+  slug        String    @unique
+  description String?
+  image       String?
+  products    Product[]
+  createdAt   DateTime  @default(now())
+}
+
+model Product {
+  id                   String           @id @default(cuid())
+  name                 String
+  slug                 String           @unique
+  description          String
+  shortDesc            String?
+  goal                 Goal?
+  brand                String
+  images               String // JSON array string
+  isFeatured           Boolean          @default(false)
+  isSubscription       Boolean          @default(false)
+  subscriptionDiscount Int              @default(10)
+  rating               Float            @default(0)
+  reviewCount          Int              @default(0)
+  categoryId           String
+  category             Category         @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  variants             ProductVariant[]
+  reviews              Review[]
+  nutrition            String? // JSON: NutritionFacts
+  ingredients          String?
+  usage                String?
+  createdAt            DateTime         @default(now())
+  updatedAt            DateTime         @updatedAt
+
+  @@index([categoryId])
+  @@index([slug])
+  @@index([isFeatured])
+  @@index([brand])
+}
+
+model ProductVariant {
+  id             String  @id @default(cuid())
+  productId      String
+  product        Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  name           String
+  sku            String  @unique
+  price          Float
+  compareAtPrice Float?
+  stock          Int     @default(0)
+  image          String?
+  attributes     String // JSON: { flavor, size }
+  isDefault      Boolean @default(false)
+
+  @@index([productId])
+  @@index([sku])
+}
+
+model Review {
+  id        String   @id @default(cuid())
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  userName  String
+  rating    Int
+  comment   String
+  createdAt DateTime @default(now())
+
+  @@index([productId])
+}
+
+model Order {
+  id           String      @id @default(cuid())
+  tracking     String      @unique
+  customerName String
+  phone        String
+  wilaya       String?
+  address      String?
+  email        String?
+  items        String // JSON array of cart items
+  subtotal     Float
+  discount     Float       @default(0)
+  promoCode    String?
+  shipping     Float       @default(0)
+  total        Float
+  status       OrderStatus @default(pending)
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  @@index([tracking])
+  @@index([phone])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model Promo {
+  id        String   @id @default(cuid())
+  code      String   @unique
+  discount  Int
+  expiry    DateTime
+  active    Boolean  @default(true)
+  uses      Int      @default(0)
+  maxUses   Int?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([code])
+  @@index([active])
+}
+
+model AdminUser {
+  id           String   @id @default(cuid())
+  username     String   @unique
+  passwordHash String
+  createdAt    DateTime @default(now())
+
+  @@index([username])
+}

@@ -1,0 +1,113 @@
+@import "tailwindcss";
+
+:root {
+  --primary-gold: #D4AF37;
+  --taupe: #BDB76B;
+  --cream: #FDFBD4;
+  --warm-bronze: #CE8946;
+  --dark: #1a1a1a;
+  --background: #FDFBD4;
+  --foreground: #1a1a1a;
+}
+
+@theme inline {
+  --color-primary-gold: var(--primary-gold);
+  --color-taupe: var(--taupe);
+  --color-cream: var(--cream);
+  --color-warm-bronze: var(--warm-bronze);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+}
+
+body {
+  background: #FDFBD4;
+  color: #1a1a1a;
+  font-family: var(--font-cairo), system-ui, -apple-system, sans-serif;
+}
+
+/* type scale */
+.hero-title {
+  font-family: var(--font-almarai);
+  font-size: 40px;
+  line-height: 1.15;
+  font-weight: 800;
+}
+@media (max-width: 1024px) {
+  .hero-title { font-size: 36px; }
+}
+@media (max-width: 640px) {
+  .hero-title { font-size: 32px; }
+}
+.section-title {
+  font-family: var(--font-cairo);
+  font-size: 26px;
+  font-weight: 700;
+}
+.product-title {
+  font-family: var(--font-tajawal);
+  font-size: 16px;
+  font-weight: 700;
+}
+.price {
+  font-family: var(--font-almarai);
+  font-size: 19px;
+  font-weight: 800;
+}
+.body-text {
+  font-size: 14px;
+  font-weight: 400;
+}
+.badge-text {
+  font-size: 12px;
+  font-weight: 700;
+}
+
+/* blocks */
+.block-cream { background: #FDFBD4; }
+.block-white { background: #ffffff; }
+.block-dark { background: #1a1a1a; color: white; }
+
+/* marquee */
+.brands-viewport {
+  overflow: hidden;
+  width: 100%;
+}
+.brands-track {
+  display: flex;
+  gap: 1.5rem;
+  width: max-content;
+  animation: scroll 18s linear infinite;
+  will-change: transform;
+}
+@keyframes scroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+.brands-track:hover {
+  animation-play-state: paused;
+}
+.brand-item {
+  filter: grayscale(1);
+  opacity: 0.6;
+  transition: all 0.3s;
+}
+.brand-item:hover {
+  filter: grayscale(0);
+  opacity: 1;
+  transform: translateY(-2px);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-thumb { background: #BDB76B; border-radius: 999px; }
+::-webkit-scrollbar-track { background: #FDFBD4; }
+
+/* print */
+@media print {
+  header, footer, nav { display: none !important; }
+  body { background: white !important; }
+  main { padding: 0 !important; }
+  .print\:hidden { display: none !important; }
+  .print\:shadow-none { box-shadow: none !important; }
+  #print-receipt { border: 2px solid black !important; box-shadow: none !important; }
+}

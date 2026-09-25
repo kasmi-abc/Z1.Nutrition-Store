@@ -1,0 +1,36 @@
+{
+  "name": "supplement-store",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --webpack",
+    "build": "next build --webpack",
+    "start": "next start",
+    "lint": "eslint",
+    "images": "node scripts/fetch-images.mjs",
+    "db:push": "prisma db push",
+    "db:seed": "node prisma/seed.mjs",
+    "db:generate": "prisma generate"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.16.0",
+    "bcryptjs": "^2.4.3",
+    "jose": "^6.0.11",
+    "next": "^16.3.5",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "zod": "^3.25.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "4.1.3",
+    "@types/bcryptjs": "^2.4.6",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "16.3.5",
+    "prisma": "^6.16.0",
+    "tailwindcss": "4.1.3",
+    "typescript": "^5"
+  }
+}
