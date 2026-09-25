@@ -1,9 +1,7 @@
-import * as jose from "jose"
 import bcrypt from "bcryptjs"
+import { signJwt, verifyJwt } from "@/lib/jwt-edge"
 
 const SECRET = process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET || "change-me-32chars"
-const secretKey = new TextEncoder().encode(SECRET)
-const ALG = "HS256"
 const COOKIE_NAME = "z1_admin_token"
 const MAX_AGE = 12 * 60 * 60 // 12h
 
@@ -16,21 +14,14 @@ export async function verifyPassword(plain: string, hash: string): Promise<boole
 }
 
 export async function signAdminToken(payload: { username: string }) {
-  return await new jose.SignJWT({ username: payload.username, role: "admin" })
-    .setProtectedHeader({ alg: ALG })
-    .setIssuedAt()
-    .setExpirationTime(`${MAX_AGE}s`)
-    .sign(secretKey)
+  const now = Math.floor(Date.now() / 1000)
+  return signJwt({ username: payload.username, role: "admin", iat: now, exp: now + MAX_AGE }, SECRET)
 }
 
 export async function verifyAdminToken(token: string): Promise<{ username: string } | null> {
-  try {
-    const { payload } = await jose.jwtVerify(token, secretKey)
-    if (payload.role !== "admin" || typeof payload.username !== "string") return null
-    return { username: payload.username as string }
-  } catch {
-    return null
-  }
+  const payload = await verifyJwt(token, SECRET)
+  if (!payload || payload.role !== "admin" || typeof payload.username !== "string") return null
+  return { username: payload.username as string }
 }
 
 export function getAuthCookieName() {

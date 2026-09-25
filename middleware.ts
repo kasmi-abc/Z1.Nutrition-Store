@@ -1,8 +1,12 @@
 import { NextResponse } from "next/server"
 import type { NextRequest } from "next/server"
-import * as jose from "jose"
+import { verifyJwt } from "@/lib/jwt-edge"
 
 const COOKIE_NAME = "z1_admin_token"
+
+function getSecret() {
+  return process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET || "change-me-32chars"
+}
 
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl
@@ -23,11 +27,8 @@ export async function middleware(req: NextRequest) {
       return NextResponse.redirect(url)
     }
     try {
-      const secret = new TextEncoder().encode(
-        process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET || "change-me-32chars"
-      )
-      const { payload } = await jose.jwtVerify(token, secret)
-      if (payload.role !== "admin") throw new Error("not admin")
+      const payload = await verifyJwt(token, getSecret())
+      if (!payload || payload.role !== "admin") throw new Error("not admin")
     } catch {
       const url = req.nextUrl.clone()
       url.pathname = "/admin/login"
@@ -49,10 +50,8 @@ export async function middleware(req: NextRequest) {
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
       }
       try {
-        const secret = new TextEncoder().encode(
-          process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET || "change-me-32chars"
-        )
-        await jose.jwtVerify(token, secret)
+        const payload = await verifyJwt(token, getSecret())
+        if (!payload || payload.role !== "admin") throw new Error("not admin")
       } catch {
         return NextResponse.json({ error: "Invalid token" }, { status: 401 })
       }
